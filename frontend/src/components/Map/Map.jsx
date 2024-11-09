@@ -2,7 +2,10 @@ import React from "react";
 
 const Map = () => {
     return (
-        <h1>Map</h1>
+        <section>
+            <h1>This is the map component</h1>
+        </section>
     );
-}
-export default Map
+};
+
+export default Map;
