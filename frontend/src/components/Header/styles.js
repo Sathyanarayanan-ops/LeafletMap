@@ -1,27 +1,19 @@
-import { styled, alpha } from '@mui/material/styles';
+import { makeStyles } from "@mui/styles";
 
-export const Toolbar = styled('div')({
-  display: 'flex',
-  justifyContent: 'space-between',
+const useStyles = makeStyles({
+    appBar: {
+        backgroundColor: "#000", // Black Uber-like theme
+    },
+    toolbar: {
+        display: "flex",
+        justifyContent: "space-between",
+    },
+    logo: {
+        fontWeight: "bold",
+    },
+    button: {
+        marginLeft: "10px",
+    },
 });
 
-export const Title = styled('div')(({ theme }) => ({
-  display: 'none',
-  [theme.breakpoints.up('sm')]: {
-    display: 'block',
-  },
-}));
-
-export const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 'auto',
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    width: 'auto',
-  },
-}));
+export default useStyles;
