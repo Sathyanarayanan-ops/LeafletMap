@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useStyles from "./styles";
 
-const Ride = () => {
+const Ride = ({onLocationUpdate}) => {
     const classes = useStyles();
 
     // State to track input values
@@ -40,11 +40,7 @@ const Ride = () => {
     };
 
     const handleSearch = () => {
-        console.log("Search button clicked with data:", {
-            pickupLocation,
-            dropoffLocation,
-            stops,
-        });
+        onLocationUpdate({pickup: pickupLocation, dropoff: dropoffLocation});
     };
 
     return (
