@@ -21,7 +21,7 @@ const Header = () => {
     };
 
     return (
-        <AppBar position="static" className={classes.appBar}>
+        <AppBar position="static" className={classes.appBar} color="inherit">
             <Toolbar className={classes.toolbar}>
                 {/* Left Group : Logo + Ride */}
                 <div className={classes.leftGroup}>
