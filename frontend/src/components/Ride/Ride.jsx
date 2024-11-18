@@ -40,7 +40,13 @@ const Ride = ({onLocationUpdate}) => {
     };
 
     const handleSearch = () => {
-        onLocationUpdate({pickup: pickupLocation, dropoff: dropoffLocation});
+        const trip =[
+            pickupLocation,
+            ...stops.filter((stop) => stop.trim() !== ""),
+            dropoffLocation,
+        ]
+        onLocationUpdate(trip);
+
     };
 
     return (
@@ -54,26 +60,9 @@ const Ride = ({onLocationUpdate}) => {
                 value={pickupLocation}
                 onChange={(e) => setPickupLocation(e.target.value)} // Update state
             />
-            <TextField
-                id="dropoff-location"
-                label="Dropoff Location"
-                variant="filled"
-                className={classes.textbar}
-                value={dropoffLocation}
-                onChange={(e) => setDropoffLocation(e.target.value)} // Update state
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <IconButton onClick={handleAddStop}>
-                                <AddIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    ),
-                }}
-            />
             {/* Render dynamically added stop fields */}
             {stops.map((stop, index) => (
-                <TextField
+            <TextField
                     key={`stop-${index}`}
                     id={`stop-${index}`}
                     label="Add a stop"
@@ -92,14 +81,24 @@ const Ride = ({onLocationUpdate}) => {
                     }}
                 />
             ))}
-            <Button
-                className={classes.button}
-                onClick={handleRideNow}
-                disableElevation
-            >
-                Ride Now
-            </Button>
-            <Button
+            <TextField
+                id="dropoff-location"
+                label="Dropoff Location"
+                variant="filled"
+                className={classes.textbar}
+                value={dropoffLocation}
+                onChange={(e) => setDropoffLocation(e.target.value)} // Update state
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton onClick={handleAddStop}>
+                                <AddIcon />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                }}
+            />
+             <Button
                 className={classes.button}
                 onClick={handleSearch}
                 disableElevation
@@ -107,6 +106,14 @@ const Ride = ({onLocationUpdate}) => {
             >
                 Search
             </Button>
+            <Button
+                className={classes.button}
+                onClick={handleRideNow}
+                disableElevation
+            >
+                Ride Now
+            </Button>
+           
         </div>
     );
 };

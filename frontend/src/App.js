@@ -6,6 +6,9 @@ import Map from "./components/Map/Map";
 
 
 const App = () => {
+    const handleLocationUpdate = (trip) => {
+        console.log("Trip data received", trip);
+    }
 
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -31,7 +34,7 @@ const App = () => {
                         padding: "16px",
                     }}
                 >
-                    <Ride/>
+                    <Ride onLocationUpdate={handleLocationUpdate}/>
                 </Box>
             </Box>
     );
