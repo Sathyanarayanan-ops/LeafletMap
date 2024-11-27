@@ -3,12 +3,13 @@ import { Box } from "@mui/material";
 import Header from "./components/Header/Header";
 import Ride from "./components/Ride/Ride";
 import Map from "./components/Map/Map";
+import axios from 'axios';
 
 
 const App = () => {
-    const handleLocationUpdate = (trip) => {
-        console.log("Trip data received", trip);
-    }
+    // const handleLocationUpdate = (trip) => {
+    //     console.log("Trip data received", trip);
+    // }
 
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -34,7 +35,7 @@ const App = () => {
                         padding: "16px",
                     }}
                 >
-                    <Ride onLocationUpdate={handleLocationUpdate}/>
+                    <Ride />
                 </Box>
             </Box>
     );
