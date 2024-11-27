@@ -3,8 +3,10 @@ import { TextField, InputAdornment, IconButton, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useStyles from "./styles";
+import apiClient from "../api";
 
-const Ride = ({onLocationUpdate}) => {
+
+const Ride = () => {
     const classes = useStyles();
 
     // State to track input values
@@ -39,13 +41,19 @@ const Ride = ({onLocationUpdate}) => {
         console.log("Ride now clicked");
     };
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         const trip =[
             pickupLocation,
             ...stops.filter((stop) => stop.trim() !== ""),
             dropoffLocation,
         ]
-        onLocationUpdate(trip);
+        //Axios logic to POST data
+        try{
+            const response = await apiClient.post('/trips/',{trip});
+            console.log(response.data);
+        }catch(error){
+            console.error(error);
+        }
 
     };
 
