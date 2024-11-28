@@ -1,5 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-def rides(request):
+def trips(request):
     return HttpResponse("Hello world!")
