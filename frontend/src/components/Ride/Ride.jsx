@@ -48,6 +48,7 @@ const Ride = () => {
             dropoffLocation,
         ]
         //Axios logic to POST data
+        console.log("Sending POST request with data ", trip);
         try{
             const response = await apiClient.post('/trips/',{trip});
             console.log(response.data);
