@@ -1,0 +1,67 @@
+# ======================
+# Global ignores
+# ======================
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ======================
+# Frontend (React/Node)
+# ======================
+# Node modules
+frontend/node_modules/
+
+# Production builds
+frontend/build/
+frontend/.next/
+frontend/out/
+
+# Testing
+frontend/coverage/
+
+# Editor artifacts
+frontend/.pnp
+frontend/.pnp.js
+
+# Misc
+frontend/.cache/
+frontend/package-lock.json
+frontend/yarn.lock
+
+# ======================
+# Backend (Django/Python)
+# ======================
+# Python bytecode
+backend/__pycache__/
+backend/*.py[cod]
+
+# Virtual environments
+backend/venv/
+backend/env/
+
+# SQLite database
+backend/*.sqlite3
+
+# Django migrations
+backend/rides/migrations/
+backend/mapback/migrations/
+
+# Misc
+backend/*.log
+backend/staticfiles/
+backend/media/
+
+
