@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import osmnx as ox
-import osmapi as osm
 
 from aStarEngine_package.algorithms.aStar_multi import astar_pathfind_multi_stop
 
@@ -13,7 +12,7 @@ from aStarEngine_package.utils.routing import Routing
 
 
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 def trips(request):
     '''
         Trips function , that takes in the HTTP req from the frontend and returns route , making use of 
@@ -32,21 +31,16 @@ def trips(request):
         G = ox.load_graphml(graph_path)
         router = Routing(graph_path)
         route = router.get_route(stops)
-        print("Node corresponding lat : ",G.nodes[123573347]['y'])
-        print("Node corresponding long : ",G.nodes[123573347]['x'])
+        # print("Node corresponding lat : ",G.nodes[11859347449]['y'])
+        # print("Node corresponding long : ",G.nodes[11859347449]['x'])
         
-        api = osm.OsmApi()
-        # testnode = api.NodeGet()
         
-        # coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in route]
+        coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in route]
         # print(coords)
         #123573347 start node 
         # 123539927, 123135327 end nodes
         
-        test_node = api.NodeGet(123573347)
-        print("Testing the other onoe",test_node['lat'])
-        print(test_node['lon'])
 
-        print(route)
+        # print(route)
         
-        return Response()
+        return coords
