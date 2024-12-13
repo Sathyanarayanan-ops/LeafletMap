@@ -2,4 +2,4 @@
 
 Django backend fixing 
 
-Fix Display map first , render in backend
+Map display done 
