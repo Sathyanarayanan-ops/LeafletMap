@@ -1,4 +1,4 @@
-# gmaps-companion
+# Map Display
 
 Django backend fixing 
 
