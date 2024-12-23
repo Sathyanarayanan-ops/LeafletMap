@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import { TextField, InputAdornment, IconButton, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -5,8 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import useStyles from "./styles";
 import apiClient from "../api";
 
-
-const Ride = () => {
+const Ride = ({ onSearch }) => {
     const classes = useStyles();
 
     // State to track input values
@@ -21,7 +22,7 @@ const Ride = () => {
     const handleAddStop = () => {
         if (stops.length < 5) {
             setStops([...stops, ""]); // Add an empty stop if limit not reached
-        } 
+        }
     };
 
     const handleStopChange = (index, value) => {
@@ -37,25 +38,21 @@ const Ride = () => {
         setStops(updatedStops);
     };
 
-    const handleRideNow = () => {
-        console.log("Ride now clicked");
-    };
-
     const handleSearch = async () => {
-        const trip =[
+        const trip = [
             pickupLocation,
             ...stops.filter((stop) => stop.trim() !== ""),
             dropoffLocation,
-        ]
-        //Axios logic to POST data
-        console.log("Sending POST request with data ", trip);
-        try{
-            const response = await apiClient.post('/trips/',{trip});
-            console.log(response.data);
-        }catch(error){
-            console.error(error);
-        }
+        ];
+        console.log("Trip array being sent to the backend:", trip);
 
+        try {
+            const response = await apiClient.post("/trips/", { trip });
+            console.log("Trip search response:", response.data);
+            onSearch(trip); // Pass trip to parent (App) for Map rendering
+        } catch (error) {
+            console.error("Error searching trip:", error);
+        }
     };
 
     return (
@@ -71,10 +68,10 @@ const Ride = () => {
             />
             {/* Render dynamically added stop fields */}
             {stops.map((stop, index) => (
-            <TextField
+                <TextField
                     key={`stop-${index}`}
                     id={`stop-${index}`}
-                    label="Add a stop"
+                    label={`Stop ${index + 1}`}
                     variant="filled"
                     className={classes.textbar}
                     value={stop}
@@ -107,7 +104,7 @@ const Ride = () => {
                     ),
                 }}
             />
-             <Button
+            <Button
                 className={classes.button}
                 onClick={handleSearch}
                 disableElevation
@@ -115,14 +112,6 @@ const Ride = () => {
             >
                 Search
             </Button>
-            <Button
-                className={classes.button}
-                onClick={handleRideNow}
-                disableElevation
-            >
-                Ride Now
-            </Button>
-           
         </div>
     );
 };
