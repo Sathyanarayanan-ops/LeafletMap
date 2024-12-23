@@ -4,9 +4,10 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useStyles from "./styles";
 import apiClient from "../api";
+// import Map from "../Map/Map";
 
 
-const Ride = () => {
+const Ride = ({onSearch}) => {
     const classes = useStyles();
 
     // State to track input values
@@ -48,10 +49,11 @@ const Ride = () => {
             dropoffLocation,
         ]
         //Axios logic to POST data
-        console.log("Sending POST request with data ", trip);
+        // console.log("Sending POST request with data ", trip);
         try{
             const response = await apiClient.post('/trips/',{trip});
             console.log(response.data);
+            onSearch();
         }catch(error){
             console.error(error);
         }
