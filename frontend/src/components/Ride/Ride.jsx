@@ -44,6 +44,12 @@ const Ride = ({ onSearch }) => {
             ...stops.filter((stop) => stop.trim() !== ""),
             dropoffLocation,
         ];
+        
+        if (trip.some((location) => location === "")) {
+            console.error("Invalid trip data: One or more locations are empty.");
+            return;
+        }
+
         console.log("Trip array being sent to the backend:", trip);
 
         try {

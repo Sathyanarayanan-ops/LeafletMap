@@ -46,6 +46,7 @@ const Map = ({ refreshMap, trip = [] }) => {
     // Pan map to the first trip location when trip data changes
     useEffect(() => {
         if (mapRef.current && trip && trip.length > 0) {
+            console.log("Trip data received by Map Component",trip)
             const map = mapRef.current;
             const [lat, lng] = trip[0]; // First trip location
             if (lat && lng) {
