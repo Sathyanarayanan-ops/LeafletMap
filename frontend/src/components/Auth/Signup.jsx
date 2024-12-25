@@ -14,7 +14,7 @@ const Signup = () => {
     });
 
     const navigate = useNavigate();
-
+    
     const [error, setError] = useState("");
 
     const handleChange = (e) => {
@@ -162,7 +162,7 @@ const Signup = () => {
                                     <Button
                                         variant="text"
                                         color="primary"
-                                        onClick={() => navigate("/")} // Navigate to login page
+                                        onClick={() => navigate("/login")} // Navigate to login page
                                         sx={{ textTransform: "none" }}
                                     >
                                         Login
