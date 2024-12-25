@@ -70,3 +70,10 @@ def trips(request):
 
     # If the request method is neither GET nor POST
     return Response({"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['POST'])
+def signup():
+    if request.method == 'POST':
+        pass
+    
