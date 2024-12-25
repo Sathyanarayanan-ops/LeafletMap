@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
-import apiClient from "../api";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 const Signup = () => {
     const [formData, setFormData] = useState({
         first_name: "",
-        last_name:"",
+        last_name: "",
         email: "",
         password: "",
+        confirm_password: "", // Added confirm_password to state
     });
+
+    const navigate = useNavigate();
 
     const [error, setError] = useState("");
 
@@ -21,18 +26,35 @@ const Signup = () => {
         e.preventDefault();
         setError("");
 
+        // Check if passwords match
+        if (formData.password !== formData.confirm_password) {
+            setError("Passwords do not match.");
+            return;
+        }
+
         try {
             const response = await fetch("http://localhost:8000/api/signup/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    first_name: formData.first_name,
+                    last_name: formData.last_name,
+                    email: formData.email,
+                    password: formData.password,
+                }),
             });
 
             if (response.ok) {
                 alert("Signup successful! Please login.");
-                setFormData({ first_name: "",last_name: "", email: "", password: "" });
+                setFormData({
+                    first_name: "",
+                    last_name: "",
+                    email: "",
+                    password: "",
+                    confirm_password: "",
+                });
             } else {
                 const data = await response.json();
                 setError(data.error || "Signup failed. Please try again.");
@@ -108,6 +130,16 @@ const Signup = () => {
                         type="password"
                         required
                     />
+                    <TextField
+                        label="Confirm Password"
+                        name="confirm_password"
+                        value={formData.confirm_password}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        type="password"
+                        required
+                    />
                     <Button
                         type="submit"
                         variant="contained"
@@ -117,12 +149,26 @@ const Signup = () => {
                     >
                         Signup
                     </Button>
-                </form>
-                <Typography
-                    variant="body2"
-                    sx={{ marginTop: "1rem", textAlign: "center" }}
-                >
-                    Already have an account? <a href="/login">Login</a>
+                            </form>
+                            <Typography
+                                variant="body2"
+                                sx={{ marginTop: "1rem", textAlign: "center" }}
+                            >
+                                <Typography
+                                    variant="body2"
+                                    sx={{ marginTop: "1rem", textAlign: "center" }}
+                                >
+                                    Already have an account?{" "}
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        onClick={() => navigate("/")} // Navigate to login page
+                                        sx={{ textTransform: "none" }}
+                                    >
+                                        Login
+                                    </Button>
+                                </Typography>
+
                 </Typography>
             </Box>
         </Box>
