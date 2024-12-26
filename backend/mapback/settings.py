@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rides',
     'rest_framework',
     'corsheaders',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,16 @@ AUTHENTICATION_BACKENDS = [
     'rides.auth_backend.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Default permission for all views
+    ],
+}
+
 
 
 ROOT_URLCONF = 'mapback.urls'
