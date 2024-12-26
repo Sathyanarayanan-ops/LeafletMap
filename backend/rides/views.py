@@ -5,6 +5,7 @@ from rest_framework.response import Response
 import osmnx as ox
 from aStarEngine_package.utils.routing import Routing
 from django.contrib.auth.models import User
+from .models import Rider 
 
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
@@ -74,16 +75,28 @@ def trips(request):
 
 
 @api_view(['POST'])
-def signup(request):
+def rider_signup(request):
     if request.method == 'POST':
-        print(request.data)
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
         username =  first_name + last_name
         email = request.data.get('email')
-        user_password = request.data.get('password')
-        user = User.objects.create_user(username=username,first_name=first_name,last_name=last_name,email=email,password = user_password)
-        user.save()
-        return Response()
+        password = request.data.get('password')
+        
+        if User.objects.filter(email=email).exists():   # User.objects corresponds to auth_users so the query set is for that table 
+            return Response({"error":"email already exists"},status=400)
+        
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password = password)
+        
+        rider = Rider.objects.create(
+            user=user
+        )
+
+        return Response({"message":"Rider Created successfully!"},status = 201)
         
     

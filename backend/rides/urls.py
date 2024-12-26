@@ -1,8 +1,8 @@
 from django.urls import path
 from .views import trips
-from .views import signup
+from .views import rider_signup
 
 urlpatterns = [
     path('api/trips/', trips, name='trips'),
-    path('api/signup/',signup, name = 'signup'),
+    path('api/rider-signup/',rider_signup, name = 'rider-signup'),
 ]
