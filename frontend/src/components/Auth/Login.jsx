@@ -1,25 +1,24 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom"; // Import navigate for redirection
 
-const Login = () => {
+const Login = ({ onLogin }) => {  // Receive onLogin prop
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
 
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-
+    const handleLogin = async () => {
         try {
-            const response = await fetch("http://localhost:8000/api/login/", {
+            const response = await fetch("http://localhost:8000/api/rider-login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -29,8 +28,12 @@ const Login = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                alert("Login successful!");
-                console.log("Token:", data.token); // Handle token storage here
+                // alert("Login successful!");
+                console.log("Token:", data.token);
+
+                // Call the onLogin function passed as a prop
+                onLogin();
+                navigate("/map"); // Optional: navigate immediately
             } else {
                 const data = await response.json();
                 setError(data.error || "Login failed. Please try again.");
@@ -38,6 +41,12 @@ const Login = () => {
         } catch (error) {
             setError("Something went wrong. Please try again.");
         }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError(""); // Reset error before login
+        handleLogin();
     };
 
     return (

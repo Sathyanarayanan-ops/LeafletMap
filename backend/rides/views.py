@@ -6,11 +6,15 @@ import osmnx as ox
 from aStarEngine_package.utils.routing import Routing
 from django.contrib.auth.models import User
 from .models import Rider 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+
 
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
 
 
+@login_required(login_url='/api/rider-login/')
 @api_view(['GET', 'POST'])
 def trips(request):
     """
@@ -99,4 +103,18 @@ def rider_signup(request):
 
         return Response({"message":"Rider Created successfully!"},status = 201)
         
-    
+        
+@api_view(['POST'])
+def rider_login(request):
+    if request.method == 'POST':
+        email = request.data.get('email')
+        password = request.data.get("password")
+        try:
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return Response({"message": "Login successful"}, status=200)
+            else:
+                return Response({"error": "Invalid login credentials"}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

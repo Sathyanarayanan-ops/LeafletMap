@@ -64,7 +64,7 @@ const App = () => {
                     <Route
                         path="/"
                         element={
-                            isLoggedIn ? <Navigate to="/map" /> : <Login onLogin={() => setIsLoggedIn(true)} />
+                            isLoggedIn ? <Navigate to="/map" /> : <Login onLogin={handleLogin} />
                         }
                     />
                     <Route path="/signup" element={<Signup/>} />

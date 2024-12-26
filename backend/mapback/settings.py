@@ -65,6 +65,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+AUTHENTICATION_BACKENDS = [
+    'rides.auth_backend.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 ROOT_URLCONF = 'mapback.urls'
 
