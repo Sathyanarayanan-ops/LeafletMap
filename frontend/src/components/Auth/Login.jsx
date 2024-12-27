@@ -24,15 +24,15 @@ const Login = ({ onLogin }) => {  // Receive onLogin prop
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
+                // credentials:"include",
             });
 
             if (response.ok) {
                 const data = await response.json();
                 // alert("Login successful!");
-                console.log("Token:", data.token);
 
                 // Call the onLogin function passed as a prop
-                onLogin();
+                onLogin(data.access);
                 navigate("/map"); // Optional: navigate immediately
             } else {
                 const data = await response.json();

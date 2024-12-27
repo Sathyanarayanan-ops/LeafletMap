@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 import osmnx as ox
 from aStarEngine_package.utils.routing import Routing
@@ -10,14 +10,17 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
 
 
-@permission_classes([IsAuthenticated])
+
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def trips(request):
     """
     Trips function that takes in the HTTP request from the frontend and returns a route,
@@ -81,6 +84,7 @@ def trips(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def rider_signup(request):
     if request.method == 'POST':
         first_name = request.data.get('first_name')
@@ -107,6 +111,7 @@ def rider_signup(request):
         
         
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def rider_login(request):
     if request.method == 'POST':
         email = request.data.get('email')
@@ -114,11 +119,62 @@ def rider_login(request):
         try:
             user = authenticate(request, email=email, password=password)
             if user is not None:
-                login(request, user)
-                token, created = Token.objects.get_or_create(user=user) #TOken created and sent to frontend to store in local storage
+                # login(request, user) # Not using the django sessions , directly using drf token
+                # token, created = Token.objects.get_or_create(user=user) #TOken created and sent to frontend to store in local storage
                 
-                return Response({"token": token.key}, status=200)
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+                
+                response = Response({"message":"Login Successful"},status=200)
+                response.set_cookie(
+                    key="access_token",
+                    value=access_token,
+                    httponly = True,
+                    secure= True,
+                    samesite="Lax",
+                )
+                response.set_cookie(
+                    key="refresh_token",
+                    value = refresh_token,
+                    httponly=True,
+                    secure = True,
+                    samesite = "Lax",
+                )
+                return response
             else:
-                return Response({"error": "Invalid login credentials"}, status=400)
+                return Response({"error": "Invalid login credentials"}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_token(request):
+    refresh_token = request.COOKIES.get('refresh_token')
+    if not refresh_token:
+        return Response({"error": "Refresh token missing"}, status=400)
+    try:
+        token = RefreshToken(refresh_token)
+        access_token = str(token.access_token)
+
+        # Set the new access token as a cookie
+        response = Response({"message": "Token refreshed"})
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+        )
+        return response
+    except Exception as e:
+        return Response({"error": "Invalid refresh token"}, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout(request):
+    response = Response({"message": "Logged out successfully"}, status=200)
+    response.delete_cookie("access_token")  # Clear the access token cookie
+    response.delete_cookie("refresh_token")  # Clear the refresh token cookie (if applicable)
+    return response
