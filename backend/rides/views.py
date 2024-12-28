@@ -6,17 +6,12 @@ import osmnx as ox
 from aStarEngine_package.utils.routing import Routing
 from django.contrib.auth.models import User
 from .models import Rider 
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-
 
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
-
 
 
 @api_view(['GET', 'POST'])
@@ -25,15 +20,6 @@ def trips(request):
     """
     Trips function that takes in the HTTP request from the frontend and returns a route,
     making use of the map engine library.
-
-    GET:
-        Returns the last calculated route coordinates (if available).
-
-    POST:
-        Calculates and returns the route based on provided stops.
-
-    Returns:
-        Response with route coordinates or an error message.
     """
     global stored_coords
 
@@ -72,15 +58,11 @@ def trips(request):
         if stored_coords is None:
             return Response(
                 {"message": "No route has been calculated yet."},
-                status=status.HTTP_204_NO_CONTENT  # Use 204 for "No Content"
+                status=status.HTTP_204_NO_CONTENT
             )
         
         # Return the stored coordinates
         return Response(stored_coords, status=status.HTTP_200_OK)
-
-
-    # If the request method is neither GET nor POST
-    return Response({"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['POST'])
@@ -93,23 +75,22 @@ def rider_signup(request):
         email = request.data.get('email')
         password = request.data.get('password')
         
-        if User.objects.filter(email=email).exists():   # User.objects corresponds to auth_users so the query set is for that table 
-            return Response({"error":"email already exists"},status=400)
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exists"}, status=400)
         
         user = User.objects.create_user(
             username=username,
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password = password)
-        
-        rider = Rider.objects.create(
-            user=user
+            password=password
         )
+        
+        Rider.objects.create(user=user)
 
-        return Response({"message":"Rider Created successfully!"},status = 201)
+        return Response({"message": "Rider created successfully!"}, status=201)
         
-        
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def rider_login(request):
@@ -119,62 +100,36 @@ def rider_login(request):
         try:
             user = authenticate(request, email=email, password=password)
             if user is not None:
-                # login(request, user) # Not using the django sessions , directly using drf token
-                # token, created = Token.objects.get_or_create(user=user) #TOken created and sent to frontend to store in local storage
-                
                 refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
-                refresh_token = str(refresh)
-                
-                response = Response({"message":"Login Successful"},status=200)
-                response.set_cookie(
-                    key="access_token",
-                    value=access_token,
-                    httponly = True,
-                    secure= True,
-                    samesite="Lax",
-                )
-                response.set_cookie(
-                    key="refresh_token",
-                    value = refresh_token,
-                    httponly=True,
-                    secure = True,
-                    samesite = "Lax",
-                )
-                return response
+                return Response({
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh)
+                }, status=200)
             else:
                 return Response({"error": "Invalid login credentials"}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def refresh_token(request):
-    refresh_token = request.COOKIES.get('refresh_token')
+    refresh_token = request.data.get('refresh_token')
     if not refresh_token:
         return Response({"error": "Refresh token missing"}, status=400)
     try:
         token = RefreshToken(refresh_token)
-        access_token = str(token.access_token)
-
-        # Set the new access token as a cookie
-        response = Response({"message": "Token refreshed"})
-        response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True,
-            secure=True,
-            samesite="Lax",
-        )
-        return response
+        return Response({
+            "access": str(token.access_token)
+        })
     except Exception as e:
         return Response({"error": "Invalid refresh token"}, status=400)
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def logout(request):
-    response = Response({"message": "Logged out successfully"}, status=200)
-    response.delete_cookie("access_token")  # Clear the access token cookie
-    response.delete_cookie("refresh_token")  # Clear the refresh token cookie (if applicable)
-    return response
+    """
+    For JWT, logout doesn't invalidate the token but can be handled client-side by removing the token.
+    """
+    return Response({"message": "Logged out successfully"}, status=200)

@@ -79,6 +79,6 @@ const Header = ({ onLogout }) => {
             </Toolbar>
         </AppBar>
     );
-};
+}; 
 
 export default Header;
