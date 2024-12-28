@@ -3,6 +3,7 @@ from .views import trips
 from .views import rider_signup
 from .views import rider_login
 from .views import logout
+from .views import driver_signup, driver_login
 # from .views import validate_session
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -18,5 +19,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # For the DRF-JWT
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/logout/',logout,name='logout'),
+    path('api/driver-signup/',driver_signup,name='driver-signup'),
+    path('api/driver-login/',driver_login,name='driver-login'),
+    
 
 ]

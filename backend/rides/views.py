@@ -6,6 +6,7 @@ import osmnx as ox
 from aStarEngine_package.utils.routing import Routing
 from django.contrib.auth.models import User
 from .models import Rider 
+from .models import Driver
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -71,8 +72,8 @@ def rider_signup(request):
     if request.method == 'POST':
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
-        username =  first_name + last_name
         email = request.data.get('email')
+        username = f"{email.split('@')[0]}_{User.objects.count() + 1}"
         password = request.data.get('password')
         
         if User.objects.filter(email=email).exists():
@@ -100,11 +101,15 @@ def rider_login(request):
         try:
             user = authenticate(request, email=email, password=password)
             if user is not None:
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh)
-                }, status=200)
+                # Check if the user is a Rider
+                if hasattr(user, 'rider_profile'):
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh)
+                    }, status=200)
+                else:
+                    return Response({"error": "User is not a rider"}, status=403)
             else:
                 return Response({"error": "Invalid login credentials"}, status=401)
         except Exception as e:
@@ -133,3 +138,60 @@ def logout(request):
     For JWT, logout doesn't invalidate the token but can be handled client-side by removing the token.
     """
     return Response({"message": "Logged out successfully"}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def driver_signup(request):
+    if request.method == 'POST':
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        email = request.data.get('email')
+        username = f"{email.split('@')[0]}_{User.objects.count() + 1}"
+        password = request.data.get('password')
+        license_num = request.data.get('license_num')
+        car_model = request.data.get('car_model')
+        
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email already exists"}, status=400)
+        
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+        )
+        
+        Driver.objects.create(
+            user=user,
+            license_number=license_num,
+            car_model=car_model
+            )
+
+        
+        return Response({"message":"Driver Created successfully"},status = 201)
+        
+        
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def driver_login(request):
+    if request.method == 'POST':
+        email = request.data.get('email')
+        password = request.data.get('password')
+        try:
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                # Check if the user is a Driver
+                if hasattr(user, 'driver_profile'):
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh)
+                    }, status=200)
+                else:
+                    return Response({"error": "User is not a driver"}, status=403)
+            else:
+                return Response({"error": "Invalid login credentials"}, status=401)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

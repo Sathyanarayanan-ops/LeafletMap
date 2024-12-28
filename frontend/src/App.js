@@ -6,6 +6,9 @@ import Map from "./components/Map/Map";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/Signup";
+import DriverLogin from "./components/Auth/DriverLogin";
+import DriverSignup from "./components/Auth/DriverSignup";
+
 
 const App = () => {
     const [refreshMap, setRefreshMap] = useState(false);
@@ -79,6 +82,8 @@ const App = () => {
                     }
                 />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/driver-login" element={<DriverLogin/>}/>
+                <Route path="/driver-signup" element={<DriverSignup/>}/>
                 {/* Map Page */}
                 <Route
                     path="/map"
