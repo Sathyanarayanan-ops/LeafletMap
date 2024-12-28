@@ -19,8 +19,8 @@ stored_coords = None  # Global variable to store the last calculated route coord
 @permission_classes([IsAuthenticated])
 def trips(request):
     """
-    Trips function that takes in the HTTP request from the frontend and returns a route,
-    making use of the map engine library.
+    Trips function that takes in the HTTP request from the frontend and calculates the fare
+    based on the route distance in miles.
     """
     global stored_coords
 
@@ -39,13 +39,26 @@ def trips(request):
             G = ox.load_graphml(graph_path)
             router = Routing(graph_path)
             route = router.get_route(stops)
-            coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in route]
+
+            # Calculate the total path length
+            path_length_meters = sum(
+                G[u][v][0].get('length', 0) for u, v in zip(route[:-1], route[1:])
+            )
+            path_length_miles = path_length_meters / 1609.34  # Convert meters to miles
 
             # Store the calculated coordinates for future GET requests
+            coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in route]
             stored_coords = coords
 
-            # Return the response with coordinates
-            return Response(coords, status=status.HTTP_200_OK)
+            # Calculate fare (example: $2 per mile)
+            fare = round(path_length_miles * 2, 2) + 5
+
+            # Return the response with coordinates, distance, and fare
+            return Response({
+                "coordinates": coords,
+                "distance_miles": round(path_length_miles, 2),
+                "fare": fare
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             # Handle errors gracefully and return a detailed error message
