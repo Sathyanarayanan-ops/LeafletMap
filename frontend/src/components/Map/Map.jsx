@@ -20,6 +20,12 @@ const Map = ({ refreshMap, trip = [] }) => {
                 console.log("Fetching route data...");
                 const response = await apiClient.get("/trips/");
                 console.log("Polyline data fetched:", response.data);
+                const coordinates = response.data.coordinates; // [[34.0522, -118.2437], [34.0523, -118.2448], ...]
+                const distance = response.data.distance_miles; // 2.15
+                const fare = response.data.fare; // 4.3
+                console.log("Coordinates:", coordinates);
+                console.log("Distance in miles:", distance);
+                console.log("Fare:", fare);
 
                 if (response.data && Array.isArray(response.data)) {
                     setPolyline(response.data); // Update polyline state
