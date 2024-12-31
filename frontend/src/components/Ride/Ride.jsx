@@ -62,7 +62,7 @@ const Ride = ({ onSearch }) => {
     };
 
     const handleRideNow = () => {
-        console.log("Ride Now clicked! Initiate ride logic here.");
+        console.log("Ride Now clicked ! Send the ride request to all drivers .");
     };
 
     return (

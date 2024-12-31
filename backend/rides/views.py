@@ -208,3 +208,7 @@ def driver_login(request):
                 return Response({"error": "Invalid login credentials"}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+
+def broadcast_ride(request):
+    pass
