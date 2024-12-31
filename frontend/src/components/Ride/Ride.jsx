@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, InputAdornment, IconButton, Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,6 +13,8 @@ const Ride = ({ onSearch }) => {
     const [stops, setStops] = useState([]);
     const [fare, setFare] = useState(null);
     const [distance, setDistance] = useState(null);
+    const [riderName, setRiderName] = useState(""); 
+
 
     const isSearchEnabled =
         pickupLocation.trim() !== "" &&
@@ -60,10 +62,40 @@ const Ride = ({ onSearch }) => {
             console.error("Error searching trip:", error);
         }
     };
+    useEffect(() => {
+        const fetchRiderProfile = async () => {
+            try{
+                const response = await axios.get("http://localhost:8000/api/get-rider-profile/");
+                setRiderName(response.data.name);
+            }catch(error){
+                console.error("Error fetching rider profile:",error);
+            }
+        };
+        fetchRiderProfile();
+    },[]);
 
-    const handleRideNow = () => {
-        console.log("Ride Now clicked ! Send the ride request to all drivers .");
+    const handleRideNow = async () => {
+        console.log("Ride Now clicked! Sending ride request to all drivers.");
+        const rideRequestData = {
+            pickupLocation,
+            stops: stops.filter((stop) => stop.trim() !== ""), // Ensure no empty stops are sent
+            dropoffLocation,
+            fare,
+            distance,
+            rider_name: riderName, // Replace with dynamic rider name
+        };
+    
+        try {
+            const response = await axios.post(
+                "http://localhost:8000/api/broadcast-ride",
+                rideRequestData
+            );
+            console.log("Ride broadcasted successfully:", response.data);
+        } catch (error) {
+            console.error("Error broadcasting ride request:", error);
+        }
     };
+    
 
     return (
         <div className={classes.container}>

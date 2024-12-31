@@ -208,7 +208,26 @@ def driver_login(request):
                 return Response({"error": "Invalid login credentials"}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_rider_profile(request):
+    user = request.user
+    
+    try:
+        rider_profile = user.rider_profile # accesses related name from the Rider
+        return Response({
+            "name": f"{user.first_name} {user.last_name}",
+            "email": user.email,
+            "total_rides": rider_profile.total_rides,
+            "miles": rider_profile.miles,
+            "amount_spent": rider_profile.amount_spent,
+        }, status = 200)
+    except Exception as e:
+        return Response({'error':"Rider Profile not found"},status=400)
 
-
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
 def broadcast_ride(request):
+    # RideNow button on click will post the data 
     pass
