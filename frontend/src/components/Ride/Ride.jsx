@@ -4,6 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useStyles from "./styles";
 import apiClient from "../api";
+import axios from 'axios';
 
 const Ride = ({ onSearch }) => {
     const classes = useStyles();
