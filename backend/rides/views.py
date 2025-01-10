@@ -231,10 +231,10 @@ def get_rider_profile(request):
 def broadcast_ride(request):
     # RideNow button on click will post the data 
     if request.method == 'POST':
-        Response({"Data Received"},status=200)
+        return Response(request.data,status=200)
         
     elif request.method == 'GET':
-        Response({request.data},status=200)
+        return Response(request.data,status=200)
     
 # Will need tosave the ride as pending and finished accordingly 
 #Can be handled here

@@ -66,7 +66,7 @@ const Ride = ({ onSearch }) => {
     useEffect(() => {
         const fetchRiderProfile = async () => {
             try{
-                const response = await axios.get("http://localhost:8000/api/get-rider-profile/");
+                const response = await apiClient.get("/get-rider-profile/");
                 setRiderName(response.data.name);
             }catch(error){
                 console.error("Error fetching rider profile:",error);
@@ -87,8 +87,8 @@ const Ride = ({ onSearch }) => {
         };
     
         try {
-            const response = await axios.post(
-                "http://localhost:8000/api/broadcast-ride",
+            const response = await apiClient.post(
+                "/broadcast-ride/",
                 rideRequestData
             );
             console.log("Ride broadcasted successfully:", response.data);
