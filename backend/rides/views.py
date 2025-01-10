@@ -10,6 +10,8 @@ from .models import Driver
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
+from .models import Rides
 
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
@@ -226,15 +228,37 @@ def get_rider_profile(request):
     except Exception as e:
         return Response({'error':"Rider Profile not found"},status=400)
 
+
+
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def broadcast_ride(request):
     # RideNow button on click will post the data 
     if request.method == 'POST':
-        return Response(request.data,status=200)
+        rider = get_object_or_404(Rider,user=request.user)
+        ride_request = Rides.object.create(
+            rider=rider,
+            pickup = request.data.get('pickupLocation'),
+            dropoff=request.data.get('dropoffLocation'),
+            inter_stops=request.data.get('stops', []),  # Default to empty list if not provided
+            cost=request.data.get('fare'),
+            miles=request.data.get('distance'),
+            driver_name="",  # Driver not assigned yet
+            car_model="",  # Car model not assigned yet
+            status="pending",  # Default status
+        )
+        
+        return Response({
+            "message":"Ride request created successfully",
+            "ride_id":ride_request.id,
+            "status":ride_request.status
+            },status=201)
         
     elif request.method == 'GET':
-        return Response(request.data,status=200)
+        pending_rides = Rides.objects.filter(status="pending").values(
+            'id','pickup','dropoff','inter_stops','cost','miles','status'
+        )
+        return Response(list(pending_rides),status=200)
     
 # Will need tosave the ride as pending and finished accordingly 
 #Can be handled here
