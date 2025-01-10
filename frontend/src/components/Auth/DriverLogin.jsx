@@ -24,24 +24,24 @@ const DriverLogin = ({ onLogin }) => {  // Receive onLogin prop
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
-                // credentials:"include",
             });
-
+    
             if (response.ok) {
-                const data = await response.json();
-                // alert("Login successful!");
-
-                // Call the onLogin function passed as a prop
-                onLogin(data.access);
-                navigate("/driver-menu"); // Optional: navigate immediately
+                const data = await response.json(); // Parse response JSON
+                console.log("Login successful:", data); // Debug response
+                onLogin(data.access); // Store token
+                navigate("/driver-menu"); // Redirect
             } else {
                 const data = await response.json();
+                console.error("Login failed response:", data); // Debug failure
                 setError(data.error || "Login failed. Please try again.");
             }
         } catch (error) {
+            console.error("Error in handleLogin:", error); // Debug unexpected errors
             setError("Something went wrong. Please try again.");
         }
     };
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();

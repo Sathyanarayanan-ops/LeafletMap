@@ -8,6 +8,7 @@ import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/Signup";
 import DriverLogin from "./components/Auth/DriverLogin";
 import DriverSignup from "./components/Auth/DriverSignup";
+import DriverMenu from "./components/DriverMenu";
 
 
 const App = () => {
@@ -51,6 +52,7 @@ const App = () => {
 
     const handleLogin = (token) => {
         // Save token to localStorage or use cookies
+        console.log("Token received",token)
         localStorage.setItem("token", token);
         setIsLoggedIn(true);
     };
@@ -82,8 +84,9 @@ const App = () => {
                     }
                 />
                 <Route path="/signup" element={<Signup />} />
-                <Route path="/driver-login" element={<DriverLogin/>}/>
+                <Route path="/driver-login" element={<DriverLogin onLogin={handleLogin}/>}/>
                 <Route path="/driver-signup" element={<DriverSignup/>}/>
+                <Route path="/driver-menu"  element={isLoggedIn ? <DriverMenu /> : <Navigate to="/driver-login" />} />
                 {/* Map Page */}
                 <Route
                     path="/map"
