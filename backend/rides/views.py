@@ -236,7 +236,7 @@ def broadcast_ride(request):
     # RideNow button on click will post the data 
     if request.method == 'POST':
         rider = get_object_or_404(Rider,user=request.user)
-        ride_request = Rides.object.create(
+        ride_request = Rides.objects.create(
             rider=rider,
             pickup = request.data.get('pickupLocation'),
             dropoff=request.data.get('dropoffLocation'),
