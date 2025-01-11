@@ -3,7 +3,7 @@ from .views import trips
 from .views import rider_signup
 from .views import rider_login
 from .views import logout
-from .views import driver_signup, driver_login, broadcast_ride,get_rider_profile
+from .views import driver_signup, driver_login, broadcast_ride,get_rider_profile, accept_ride
 # from .views import validate_session
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/driver-login/',driver_login,name='driver-login'),
     path('api/broadcast-ride/',broadcast_ride,name='broadcast-ride'),
     path('api/get-rider-profile/',get_rider_profile,name='get-rider-profile'),
+    path('api/accept-ride/',accept_ride,name='accept-ride'),
 
 ]

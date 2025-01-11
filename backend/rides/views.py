@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from .models import Rides
-
+from django.db.models import F
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
 
@@ -230,15 +230,15 @@ def get_rider_profile(request):
 
 
 
-@api_view(['GET','POST'])
+
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def broadcast_ride(request):
-    # RideNow button on click will post the data 
     if request.method == 'POST':
-        rider = get_object_or_404(Rider,user=request.user)
+        rider = get_object_or_404(Rider, user=request.user)
         ride_request = Rides.objects.create(
             rider=rider,
-            pickup = request.data.get('pickupLocation'),
+            pickup=request.data.get('pickupLocation'),
             dropoff=request.data.get('dropoffLocation'),
             inter_stops=request.data.get('stops', []),  # Default to empty list if not provided
             cost=request.data.get('fare'),
@@ -249,16 +249,56 @@ def broadcast_ride(request):
         )
         
         return Response({
-            "message":"Ride request created successfully",
-            "ride_id":ride_request.id,
-            "status":ride_request.status
-            },status=201)
-        
+            "message": "Ride request created successfully",
+            "ride_id": ride_request.id,
+            "status": ride_request.status
+        }, status=201)
+
     elif request.method == 'GET':
-        pending_rides = Rides.objects.filter(status="pending").values(
-            'id','pickup','dropoff','inter_stops','cost','miles','status'
+        # Include rider's name in the response
+        pending_rides = Rides.objects.filter(status="pending").annotate(
+            rider_name=F('rider__user__first_name')  # Get the first name of the rider
+        ).values(
+            'id', 'pickup', 'dropoff', 'inter_stops', 'cost', 'miles', 'status', 'rider_name'
         )
-        return Response(list(pending_rides),status=200)
-    
+        return Response(list(pending_rides), status=200)
+
 # Will need tosave the ride as pending and finished accordingly 
 #Can be handled here
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def accept_ride(request):
+    try:
+        # Extract ride ID from the request data
+        ride_id = request.data.get('ride_id')
+        if not ride_id:
+            return Response({"error": "Ride ID is required"}, status=400)
+
+        # Fetch the ride instance
+        ride = get_object_or_404(Rides, id=ride_id)
+
+        # Ensure the ride is currently pending
+        if ride.status != "pending":
+            return Response({"error": "Ride is not in pending status"}, status=400)
+
+        # Get the current driver (authenticated user)
+        driver = get_object_or_404(Driver, user=request.user)
+
+        # Assign ride ID and update status
+        ride.assign_ride_id()
+        ride.status = "completed"
+        ride.driver_name = f"{driver.user.first_name} {driver.user.last_name}"
+        ride.car_model = driver.car_model
+        ride.save()
+
+        return Response({
+            "message": "Ride accepted and marked as completed successfully",
+            "ride_id": ride.ride_id,
+            "status": ride.status,
+            "driver_name": ride.driver_name,
+            "car_model": ride.car_model,
+        }, status=200)
+
+    except Exception as e:
+        return Response({"error": f"An error occurred: {str(e)}"}, status=500)

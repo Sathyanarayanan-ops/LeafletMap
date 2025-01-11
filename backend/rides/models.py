@@ -16,23 +16,23 @@ class Rider(models.Model):
     
 class Rides(models.Model):
     ride_id = models.IntegerField(unique=True, blank=True, null=True)
-    rider = models.ForeignKey(Rider,on_delete=models.CASCADE,related_name='ride_history')
+    rider = models.ForeignKey(Rider, on_delete=models.CASCADE, related_name='ride_history')
     pickup = models.CharField(max_length=100)
     dropoff = models.CharField(max_length=100)
-    inter_stops = ArrayField(models.CharField(null=True, blank=True),size = 5)   # Used here where we have array of strings for multi stops
-    # if above does not work try ----> Make another model that holds a string with an optional order, give it a ForeignKey back to myClass, and store your array in there.
+    inter_stops = ArrayField(models.CharField(null=True, blank=True), size=5)  # Array of strings for stops
     cost = models.FloatField()
     miles = models.FloatField()
-    driver_name = models.CharField(max_length=30)
-    car_model = models.CharField()
-    status = models.CharField(max_length=20,default="in_progress")
-    
+    driver_name = models.CharField(max_length=30, blank=True, default="")
+    car_model = models.CharField(max_length=30, blank=True, default="")
+    status = models.CharField(max_length=20, default="pending")
+
     def assign_ride_id(self):
-        if self.ride_id is None and self.status == "completed":
+        if self.ride_id is None:
+            # Generate a new ride ID based on the last ride in the database
             last_ride = Rides.objects.filter(ride_id__isnull=False).order_by('-ride_id').first()
             self.ride_id = (last_ride.ride_id + 1) if last_ride else 10000
             self.save()
-            
+
 #             # Example of marking a ride as completed
 # ride = Rides.objects.get(id=1)  # Replace with the actual ride instance
 # ride.status = "completed"
