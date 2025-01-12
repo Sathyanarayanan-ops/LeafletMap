@@ -228,33 +228,36 @@ def get_rider_profile(request):
     except Exception as e:
         return Response({'error':"Rider Profile not found"},status=400)
 
-
-
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def broadcast_ride(request):
     if request.method == 'POST':
-        rider = get_object_or_404(Rider, user=request.user)
-        ride_request = Rides.objects.create(
-            rider=rider,
-            pickup=request.data.get('pickupLocation'),
-            dropoff=request.data.get('dropoffLocation'),
-            inter_stops=request.data.get('stops', []),  # Default to empty list if not provided
-            cost=request.data.get('fare'),
-            miles=request.data.get('distance'),
-            driver_name="",  # Driver not assigned yet
-            car_model="",  # Car model not assigned yet
-            status="pending",  # Default status
-        )
-        
-        return Response({
-            "message": "Ride request created successfully",
-            "ride_id": ride_request.id,
-            "status": ride_request.status
-        }, status=201)
-
+        print("POST request received at broadcast_ride endpoint")
+        try:
+            rider = get_object_or_404(Rider, user=request.user)
+            ride_request = Rides.objects.create(
+                rider=rider,
+                pickup=request.data.get('pickupLocation'),
+                dropoff=request.data.get('dropoffLocation'),
+                inter_stops=request.data.get('stops', []),  # Default to empty list if not provided
+                cost=request.data.get('fare'),
+                miles=request.data.get('distance'),
+                driver_name="",  # Driver not assigned yet
+                car_model="",  # Car model not assigned yet
+                status="pending",  # Default status
+            )
+            
+            print("Ride request created successfully:", ride_request.id)
+            return Response({
+                "message": "Ride request created successfully",
+                "ride_id": ride_request.id,
+                "status": ride_request.status
+            }, status=201)
+        except Exception as e:
+            print("Error processing POST request:", str(e))
+            return Response({"error": f"An error occurred: {str(e)}"}, status=500)
     elif request.method == 'GET':
+        print("GET request received at broadcast_ride endpoint")
         # Include rider's name in the response
         pending_rides = Rides.objects.filter(status="pending").annotate(
             rider_name=F('rider__user__first_name')  # Get the first name of the rider
@@ -263,42 +266,74 @@ def broadcast_ride(request):
         )
         return Response(list(pending_rides), status=200)
 
+
+
 # Will need tosave the ride as pending and finished accordingly 
 #Can be handled here
+
+
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def accept_ride(request):
     try:
+        print("Accept ride request received")  # Debugging log
+
         # Extract ride ID from the request data
         ride_id = request.data.get('ride_id')
         if not ride_id:
+            print("Ride ID not provided")  # Debugging log
             return Response({"error": "Ride ID is required"}, status=400)
 
         # Fetch the ride instance
+        print(f"Fetching ride with ID: {ride_id}")  # Debugging log
         ride = get_object_or_404(Rides, id=ride_id)
 
         # Ensure the ride is currently pending
         if ride.status != "pending":
+            print(f"Ride status is not pending: {ride.status}")  # Debugging log
             return Response({"error": "Ride is not in pending status"}, status=400)
 
         # Get the current driver (authenticated user)
+        print(f"Authenticated user: {request.user}")  # Debugging log
         driver = get_object_or_404(Driver, user=request.user)
 
         # Assign ride ID and update status
+        print("Assigning ride ID and updating status")  # Debugging log
         ride.assign_ride_id()
         ride.status = "completed"
         ride.driver_name = f"{driver.user.first_name} {driver.user.last_name}"
         ride.car_model = driver.car_model
         ride.save()
 
+        # Update Rider's stats
+        print("Updating rider stats")  # Debugging log
+        rider = ride.rider
+        rider.total_rides += 1
+        rider.miles += ride.miles
+        rider.amount_spent += ride.cost
+        rider.save()
+
+        # Update Driver's stats
+        print("Updating driver stats")  # Debugging log
+        driver.rides += 1
+        driver.miles += ride.miles
+        driver.amount_earned += ride.cost
+        driver.save()
+
+        print("Ride accepted and updated successfully")  # Debugging log
         return Response({
             "message": "Ride accepted and marked as completed successfully",
             "ride_id": ride.ride_id,
             "status": ride.status,
             "driver_name": ride.driver_name,
             "car_model": ride.car_model,
+            "rider_total_rides": rider.total_rides,
+            "rider_amount_spent": rider.amount_spent,
+            "driver_rides_completed": driver.rides,
+            "driver_amount_earned": driver.amount_earned
         }, status=200)
 
     except Exception as e:
+        print(f"Error in accept_ride: {str(e)}")  # Debugging log
         return Response({"error": f"An error occurred: {str(e)}"}, status=500)
