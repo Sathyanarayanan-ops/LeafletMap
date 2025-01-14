@@ -16,7 +16,6 @@ from django.db.models import F
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def trips(request):
