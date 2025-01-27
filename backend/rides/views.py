@@ -13,6 +13,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from .models import Rides
 from django.db.models import F
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'index.html')
+
 # In-memory storage for coords (for simplicity; replace with database for production)
 stored_coords = None  # Global variable to store the last calculated route coordinates
 
