@@ -87,7 +87,7 @@ ROOT_URLCONF = 'mapback.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'staticfiles'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -161,7 +161,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 STATICFILES_DIRS = [
-        BASE_DIR.parent / "frontend" / "build"
+        BASE_DIR.parent / "frontend" / "build" / "static"
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
