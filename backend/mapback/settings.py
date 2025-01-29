@@ -165,3 +165,6 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+#Supervisor and nginx setup remaining 
