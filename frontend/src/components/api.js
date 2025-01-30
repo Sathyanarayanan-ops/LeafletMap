@@ -6,7 +6,7 @@ const token = localStorage.getItem("token");
 
 // Create Axios instance with default settings
 const apiClient = axios.create({
-    baseURL: "http://localhost:8000/api", // Base URL for all API calls
+    baseURL: "http://localhost:8080/api", // Base URL for all API calls
     withCredentials: false, // No cookies required since we're using Authorization headers
     headers: {
         "Content-Type": "application/json",

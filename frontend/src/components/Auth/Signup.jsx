@@ -33,7 +33,7 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/api/rider-signup/", {
+            const response = await fetch("http://localhost:8080/api/rider-signup/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
