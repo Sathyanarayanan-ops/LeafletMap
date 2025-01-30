@@ -25,6 +25,7 @@ const App = () => {
                 return;
             }
 
+            //Changing to 8080
             try {
                 const response = await fetch("http://localhost:8000/api/token/verify/", {
                     method: "POST",
