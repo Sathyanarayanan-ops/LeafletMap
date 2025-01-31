@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z^4!e#_b-u@x$!#%op+b1(m8w+-lb4d$s(8-zx!3od+=u%=i=e'
+env = environ.Env()
+environ.Env.read_env
+# SECRET_KEY = 'django-insecure-z^4!e#_b-u@x$!#%op+b1(m8w+-lb4d$s(8-zx!3od+=u%=i=e'
+SECRET_KEY = env('SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
 
 
 # Application definition
@@ -125,6 +132,9 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': env.db(),  # Reads DATABASE_URL from .env
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
