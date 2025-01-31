@@ -120,7 +120,7 @@ DATABASES = {
         'NAME': 'RideShare',
         'USER':'postgres',
         'PASSWORD':'1972',
-        'HOST':'',
+        'HOST':'db',    # Docker service name 
         'PORT':'5432',
     }
 }
