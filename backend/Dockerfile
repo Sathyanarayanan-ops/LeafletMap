@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Django project
 COPY . .
+COPY ./data /app/data       
+# Adding the graphml data
 
 # Collect static files (run during build or in entrypoint)
 RUN python manage.py collectstatic --noinput

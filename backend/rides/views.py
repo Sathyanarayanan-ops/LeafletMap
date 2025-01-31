@@ -42,7 +42,8 @@ def trips(request):
 
         # Load the graph and calculate the route
         try:
-            graph_path = '/Users/sathya/Desktop/reactLearning/gmaps-companion/backend/data/LA_road_network.graphml'
+            # graph_path = '/Users/sathya/Desktop/reactLearning/gmaps-companion/backend/data/LA_road_network.graphml'
+            graph_path = '/app/data/LA_road_network.graphml'  # Docker path
             G = ox.load_graphml(graph_path)
             router = Routing(graph_path)
             route = router.get_route(stops)
