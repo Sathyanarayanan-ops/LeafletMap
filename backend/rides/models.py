@@ -33,7 +33,7 @@ class Rides(models.Model):
             self.ride_id = (last_ride.ride_id + 1) if last_ride else 10000
             self.save()
 
-#             # Example of marking a ride as completed
+# Example of marking a ride as completed
 # ride = Rides.objects.get(id=1)  # Replace with the actual ride instance
 # ride.status = "completed"
 # ride.assign_ride_id()
